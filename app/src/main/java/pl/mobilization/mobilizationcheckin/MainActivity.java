@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.recyclerGuest)
     RecyclerView recyclerView;
 
-    private MyAdapter adapter = new MyAdapter();
+    private MyAdapter adapter = new MyAdapter(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,46 +40,33 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
 
-        ValueEventListener postListener = new ValueEventListener() {
-            public final String TAG = ValueEventListener.class.getSimpleName();
 
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get Post object and use the values to update the UI
-                GenericTypeIndicator<List<User>> genericTypeIndicator = new GenericTypeIndicator<List<User>>() {
-                };
-                dataSnapshot.getValue(genericTypeIndicator);
-                User user = dataSnapshot.getValue(User.class);
-                // ...
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Getting Post failed, log a message
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                // ...
-            }
-        };
         reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-                User value = dataSnapshot.getValue(User.class);
-                adapter.add(value);
+                User user = dataSnapshot.getValue(User.class);
+                user.number = dataSnapshot.getKey();
+                adapter.add(user);
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
-
+                User user = dataSnapshot.getValue(User.class);
+                user.number = dataSnapshot.getKey();
+                adapter.add(user);
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                User user = dataSnapshot.getValue(User.class);
+                user.number = dataSnapshot.getKey();
+                adapter.remove(user);
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
-
+                User user = dataSnapshot.getValue(User.class);
+                adapter.add(user);
             }
 
             @Override
@@ -87,5 +74,9 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public void updateCheckedIn(User user) {
+        reference.child(user.number).setValue(user);
     }
 }

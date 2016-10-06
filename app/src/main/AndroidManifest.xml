@@ -18,7 +18,11 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <service
+            android:name=".FirebaseIntentService"
+            android:exported="false"></service>
     </application>
 
 </manifest>

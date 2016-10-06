@@ -5,25 +5,36 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Iterables;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Created by defecins on 04/10/16.
  */
 public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
-    List<User> users = new ArrayList<>();
+
+    private final MainActivity mainActivity;
+    TreeMap<String, User> users = new TreeMap<>();
+
+    public MyAdapter(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
+    }
 
     @Override
     public MyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         RelativeLayout view = (RelativeLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.attendee, parent, false);
-        return new MyHolder(view);
+        return new MyHolder(view, this);
     }
 
     @Override
     public void onBindViewHolder(MyHolder holder, int position) {
-        User user = users.get(position);
-
+        String key = FluentIterable.from(users.keySet()).get(position);
+        User user = users.get(key);
         holder.bind(user);
     }
 
@@ -33,12 +44,17 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
     }
 
     public void add(User value) {
-        users.add(value);
+        users.put(value.number, value);
         notifyDataSetChanged();
     }
 
-    public void update(User value) {
-        users.remove(value);
-        users.
+    public void remove(User user) {
+        users.remove(user.number);
+        notifyDataSetChanged();
+    }
+
+    public void updateCheckedIn(User user, boolean checked) {
+        user.checked = checked;
+        mainActivity.updateCheckedIn(user);
     }
 }

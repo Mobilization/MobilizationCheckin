@@ -15,6 +15,7 @@ import butterknife.ButterKnife;
  */
 public class MyHolder extends RecyclerView.ViewHolder {
 
+    private final MyAdapter myAdapter;
     @BindView(R.id.textViewFirstName)
     TextView textViewFirstName;
 
@@ -30,15 +31,14 @@ public class MyHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.checkBoxChecked)
     CheckBox checkBoxChecked;
 
-    public MyHolder(RelativeLayout itemView) {
-        super(itemView);
-
+    public MyHolder(RelativeLayout view, MyAdapter myAdapter) {
+        super(view);
+        this.myAdapter = myAdapter;
 
         ButterKnife.bind(this, itemView);
-
     }
 
-    public void bind(User user) {
+    public void bind(final User user) {
 
         textViewFirstName.setText(user.first);
         textViewLastName.setText(user.last);
@@ -51,7 +51,7 @@ public class MyHolder extends RecyclerView.ViewHolder {
         checkBoxChecked.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
-
+                myAdapter.updateCheckedIn(user, checked);
             }
         });
     }
