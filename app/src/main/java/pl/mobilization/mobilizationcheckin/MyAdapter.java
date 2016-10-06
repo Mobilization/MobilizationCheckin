@@ -12,6 +12,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +76,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
         return Maps.filterValues(users, new Predicate<User>() {
             @Override
             public boolean apply(User input) {
-                return input.email.contains(filter) || input.first.contains(filter) || input.last.contains(filter);
+                return input.email.contains(filter) ||
+                        Normalizer.normalize(input.first, Normalizer.Form.NFD).toLowerCase().contains(filter.toLowerCase()) ||
+                        Normalizer.normalize(input.last, Normalizer.Form.NFD).toLowerCase().contains(filter.toLowerCase());
             }
         });
     }
