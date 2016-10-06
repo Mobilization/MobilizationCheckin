@@ -5,7 +5,10 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.widget.EditText;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -27,6 +30,9 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.recyclerGuest)
     RecyclerView recyclerView;
 
+    @BindView(R.id.editTextFilter)
+    EditText editTextFilter;
+
     private MyAdapter adapter = new MyAdapter(this);
 
     @Override
@@ -40,6 +46,23 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
 
+
+        editTextFilter.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                adapter.addFilter(editable.toString());
+            }
+        });
 
         reference.addChildEventListener(new ChildEventListener() {
             @Override

@@ -5,12 +5,16 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -20,6 +24,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
 
     private final MainActivity mainActivity;
     TreeMap<String, User> users = new TreeMap<>();
+    private String filter;
 
     public MyAdapter(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
@@ -33,14 +38,14 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
 
     @Override
     public void onBindViewHolder(MyHolder holder, int position) {
-        String key = FluentIterable.from(users.keySet()).get(position);
+        String key = FluentIterable.from(getFilterdUsers(filter).keySet()).get(position);
         User user = users.get(key);
         holder.bind(user);
     }
 
     @Override
     public int getItemCount() {
-        return users.size();
+        return getFilterdUsers(filter).size();
     }
 
     public void add(User value) {
@@ -57,4 +62,23 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
         user.checked = checked;
         mainActivity.updateCheckedIn(user);
     }
+
+    public void addFilter(String filter) {
+        this.filter = filter;
+        notifyDataSetChanged();
+    }
+
+    Map<String, User> getFilterdUsers(final String filter) {
+        if(Strings.isNullOrEmpty(filter))
+            return users;
+
+        return Maps.filterValues(users, new Predicate<User>() {
+            @Override
+            public boolean apply(User input) {
+                return input.email.contains(filter) || input.first.contains(filter) || input.last.contains(filter);
+            }
+        });
+    }
+
+
 }
