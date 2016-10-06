@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "345704520405",
+    "firebase_url": "https://mobilization-check-in.firebaseio.com",
+    "project_id": "mobilization-check-in",
+    "storage_bucket": "mobilization-check-in.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:345704520405:android:90723c89fae278d8",
+        "android_client_info": {
+          "package_name": "pl.mobilization.mobilizationcheckin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "345704520405-43ets351rdh2th7o0sk8g8ra6tnf27o5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaBh2jQX_1j1qqYbpFpelRqO1chWyk1ZA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

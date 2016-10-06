@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="First"
+        android:id="@+id/textViewFirstName" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Last"
+        android:id="@+id/textViewLastName"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/textViewFirstName"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textViewFirstName"
+        android:layout_alignParentLeft="true"
+        android:text="email"
+        android:id="@+id/textViewEmail"
+        />
+
+
+    <CheckBox
+        android:id="@+id/checkBoxChecked"
+        android:text="Checked in"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/checkBoxChecked"
+        android:text="Type"
+        android:id="@+id/textViewType"/>
+
+
+</RelativeLayout>
