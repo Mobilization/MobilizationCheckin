@@ -1,20 +1,18 @@
 package pl.mobilization.mobilizationcheckin;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
-import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -23,6 +21,7 @@ import java.util.TreeMap;
  */
 public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
 
+    private static final String TAG = "MyAdapter";
     private final MainActivity mainActivity;
     TreeMap<String, User> users = new TreeMap<>();
     private String filter;
@@ -70,17 +69,26 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
     }
 
     Map<String, User> getFilterdUsers(final String filter) {
-        if(Strings.isNullOrEmpty(filter))
+        if (Strings.isNullOrEmpty(filter)) {
             return users;
+        }
 
         return Maps.filterValues(users, new Predicate<User>() {
             @Override
             public boolean apply(User input) {
                 return input.email.contains(filter) ||
-                        Normalizer.normalize(input.first, Normalizer.Form.NFD).toLowerCase().contains(filter.toLowerCase()) ||
-                        Normalizer.normalize(input.last, Normalizer.Form.NFD).toLowerCase().contains(filter.toLowerCase());
+                        normalize(input.first.toLowerCase()).contains(normalize(filter.toLowerCase())) ||
+                        normalize(input.last.toLowerCase()).contains(normalize(filter.toLowerCase()));
             }
         });
+    }
+
+    private static String normalize(String str) {
+
+        String nfdNormalizedString = StringUtils.stripAccents(str).replaceAll("ł", "l");
+        Log.d(TAG, " nfdNormalizedString " + nfdNormalizedString);
+        return nfdNormalizedString;
+
     }
 
 

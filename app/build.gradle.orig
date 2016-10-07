@@ -31,6 +31,9 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.4.0'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'com.google.guava:guava:20.0-rc1'
-    compile 'org.apache.commons:commons-lang3:3.4'
+<<<<<<< HEAD
     compile 'com.journeyapps:zxing-android-embedded:3.3.0'
+=======
+    compile 'org.apache.commons:commons-lang3:3.4'
+>>>>>>> 6692e5c0d60d5c1d3e5d708fba6c5cbd69d2f490
 }
