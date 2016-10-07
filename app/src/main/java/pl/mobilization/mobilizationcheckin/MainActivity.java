@@ -1,5 +1,6 @@
 package pl.mobilization.mobilizationcheckin;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -7,7 +8,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.widget.EditText;
 
 import com.google.firebase.database.ChildEventListener;
@@ -15,13 +15,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.List;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -60,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                adapter.addFilter(editable.toString());
+                adapter.setFilter(editable.toString());
             }
         });
 
@@ -101,5 +100,22 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateCheckedIn(User user) {
         reference.child(user.number).setValue(user);
+    }
+
+    @OnClick(R.id.imageButtonScan)
+    public void initiateScan() {
+        new IntentIntegrator(this).initiateScan(); // `this` is the current Activity
+
+    }
+
+
+    // Get the results:
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if(result != null) {
+            editTextFilter.setText(result.getContents());
+            editTextFilter.moveCursorToVisibleOffset();
+        }
     }
 }

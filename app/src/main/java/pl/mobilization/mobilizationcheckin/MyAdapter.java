@@ -64,7 +64,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
         mainActivity.updateCheckedIn(user);
     }
 
-    public void addFilter(String filter) {
+    public void setFilter(String filter) {
         this.filter = filter;
         notifyDataSetChanged();
     }
