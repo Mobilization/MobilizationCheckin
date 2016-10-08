@@ -1,6 +1,7 @@
 package pl.mobilization.mobilizationcheckin;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -14,7 +15,7 @@ import butterknife.ButterKnife;
  * Created by defecins on 04/10/16.
  */
 public class MyHolder extends RecyclerView.ViewHolder {
-
+    private static final String TAG = MyHolder.class.getSimpleName();
     private final MyAdapter myAdapter;
     @BindView(R.id.textViewFirstName)
     TextView textViewFirstName;
@@ -39,13 +40,14 @@ public class MyHolder extends RecyclerView.ViewHolder {
     }
 
     public void bind(final User user) {
-
+        Log.d(TAG, String.format("binding user %s", user));
         textViewFirstName.setText(user.first);
         textViewLastName.setText(user.last);
 
         textViewEmail.setText(user.email);
         textViewType.setText(user.type);
 
+        checkBoxChecked.setOnCheckedChangeListener(null);
         checkBoxChecked.setChecked(user.checked);
 
         checkBoxChecked.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
