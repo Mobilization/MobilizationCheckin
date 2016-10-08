@@ -1,6 +1,7 @@
 package pl.mobilization.mobilizationcheckin;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -8,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.EditText;
 
 import com.google.firebase.database.ChildEventListener;
@@ -23,6 +25,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = MainActivity.class.getSimpleName();
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference reference = database.getReference();
 
@@ -67,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
                 User user = dataSnapshot.getValue(User.class);
+                Log.d(TAG, String.format("onChildAdded(%s, %s)", user, previousChildName));
                 user.number = dataSnapshot.getKey();
                 adapter.add(user);
             }
@@ -74,21 +78,31 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
                 User user = dataSnapshot.getValue(User.class);
+                Log.d(TAG, String.format("onChildChanged(%s, %s)", user, previousChildName));
+
                 user.number = dataSnapshot.getKey();
                 adapter.add(user);
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                user.number = dataSnapshot.getKey();
+                User user = getUser(dataSnapshot);
+                Log.d(TAG, String.format("onChildRemoved(%s)", user));
+
                 adapter.remove(user);
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
-                User user = dataSnapshot.getValue(User.class);
+                User user = getUser(dataSnapshot);
                 adapter.add(user);
+            }
+
+            @NonNull
+            private User getUser(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                user.number = dataSnapshot.getKey();
+                return user;
             }
 
             @Override
@@ -99,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateCheckedIn(User user) {
+        Log.d(TAG, String.format("updateCheckedIn(%s)", user));
         reference.child(user.number).setValue(user);
     }
 

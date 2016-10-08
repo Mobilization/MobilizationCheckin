@@ -27,4 +27,16 @@ public class User {
     public int hashCode() {
         return number != null ? number.hashCode() : 0;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "first='" + first + '\'' +
+                ", last='" + last + '\'' +
+                ", email='" + email + '\'' +
+                ", type='" + type + '\'' +
+                ", number='" + number + '\'' +
+                ", checked=" + checked +
+                '}';
+    }
 }
