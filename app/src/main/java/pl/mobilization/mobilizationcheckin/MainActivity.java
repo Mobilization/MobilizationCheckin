@@ -69,24 +69,21 @@ public class MainActivity extends AppCompatActivity {
         reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-                User user = dataSnapshot.getValue(User.class);
+                User user = getUserFromDataSnapshot(dataSnapshot);
                 Log.d(TAG, String.format("onChildAdded(%s, %s)", user, previousChildName));
-                user.number = dataSnapshot.getKey();
                 adapter.add(user);
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
-                User user = dataSnapshot.getValue(User.class);
+                User user = getUserFromDataSnapshot(dataSnapshot);
                 Log.d(TAG, String.format("onChildChanged(%s, %s)", user, previousChildName));
-
-                user.number = dataSnapshot.getKey();
                 adapter.add(user);
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                User user = getUser(dataSnapshot);
+                User user = getUserFromDataSnapshot(dataSnapshot);
                 Log.d(TAG, String.format("onChildRemoved(%s)", user));
 
                 adapter.remove(user);
@@ -94,14 +91,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
-                User user = getUser(dataSnapshot);
+                User user = getUserFromDataSnapshot(dataSnapshot);
                 adapter.add(user);
             }
 
             @NonNull
-            private User getUser(DataSnapshot dataSnapshot) {
+            private User getUserFromDataSnapshot(DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
-                user.number = dataSnapshot.getKey();
+                user.setNumber(dataSnapshot.getKey());
                 return user;
             }
 
@@ -114,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateCheckedIn(User user) {
         Log.d(TAG, String.format("updateCheckedIn(%s)", user));
-        reference.child(user.number).setValue(user);
+        reference.child(user.getNumber()).setValue(user);
     }
 
     @OnClick(R.id.imageButtonScan)

@@ -41,14 +41,14 @@ public class MyHolder extends RecyclerView.ViewHolder {
 
     public void bind(final User user) {
         Log.d(TAG, String.format("binding user %s", user));
-        textViewFirstName.setText(user.first);
-        textViewLastName.setText(user.last);
+        textViewFirstName.setText(user.getFirst());
+        textViewLastName.setText(user.getLast());
 
-        textViewEmail.setText(user.email);
-        textViewType.setText(user.type);
+        textViewEmail.setText(user.getEmail());
+        textViewType.setText(user.getType());
 
         checkBoxChecked.setOnCheckedChangeListener(null);
-        checkBoxChecked.setChecked(user.checked);
+        checkBoxChecked.setChecked(user.isChecked());
 
         checkBoxChecked.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
