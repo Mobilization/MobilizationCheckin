@@ -1,7 +1,6 @@
 package pl.mobilization.mobilizationcheckin;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -9,16 +8,20 @@ import android.widget.RelativeLayout;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.base.Strings;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Sets;
 
+import java.text.Collator;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by defecins on 04/10/16.
@@ -27,8 +30,23 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
 
     private static final String TAG = "MyAdapter";
     private final MainActivity mainActivity;
-    Map<String, User> users = new TreeMap<>();
-    List<String> filteredUsers = new ArrayList<>();
+    private static final Collator POLISH_COLLATOR = Collator.getInstance(new Locale("pl", "PL"));
+    private static final Comparator<User> comparatorOfUserLexicographically = new Comparator<User>() {
+        @Override
+        public int compare(User u1, User u2) {
+            int compareLast = POLISH_COLLATOR.compare(u1.getLast(), u2.getLast());
+            if(compareLast != 0)
+                return compareLast;
+            int compareFirst = POLISH_COLLATOR.compare(u1.getFirst(), u2.getLast());
+            if (compareFirst != 0)
+                return compareFirst;
+            return u1.getNumber().compareTo(u2.getNumber());
+        }
+    };
+
+    Set<User> users = new TreeSet<>(comparatorOfUserLexicographically);
+    Set<User> filteredUsers = new TreeSet<>(comparatorOfUserLexicographically);
+
     Predicate<User> predicate = Predicates.alwaysTrue();
 
     public MyAdapter(MainActivity mainActivity) {
@@ -43,8 +61,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
 
     @Override
     public void onBindViewHolder(MyHolder holder, int position) {
-        String key = filteredUsers.get(position);
-        User user = users.get(key);
+        User user = Iterators.get(filteredUsers.iterator(), position);
         holder.bind(user);
     }
 
@@ -54,17 +71,17 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
     }
 
     public void add(User user) {
-        User thisIsUpdate = users.put(user.getNumber(), user);
-        if(thisIsUpdate == null) {
-            if(predicate.apply(user))
-                filteredUsers.add(user.getNumber());
-        }
+        boolean setIsModified = users.add(user);
+
+        if(predicate.apply(user))
+            filteredUsers.add(user);
+
         notifyDataSetChanged();
     }
 
     public void remove(User user) {
-        users.remove(user.getNumber());
-        filteredUsers.remove(user.getNumber());
+        users.remove(user);
+        filteredUsers.remove(user);
         notifyDataSetChanged();
     }
 
@@ -79,7 +96,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
 
         if(normalizedFilter.length() == 0) {
             predicate = Predicates.alwaysTrue();
-            filteredUsers = new ArrayList<String>(users.keySet());
+            filteredUsers = new TreeSet<>(comparatorOfUserLexicographically);
+            filteredUsers.addAll(filteredUsers);
             notifyDataSetChanged();
             return;
         }
@@ -96,7 +114,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
             }
         }));
 
-        filteredUsers =  new ArrayList<>(FluentIterable.from(users.values()).filter(predicate).transform(user2NumberTransformation).toSortedList(lexicographicalComparator));
+        filteredUsers.clear();
+        Iterables.addAll(filteredUsers, FluentIterable.from(users).filter(predicate));
 
         notifyDataSetChanged();
     }
