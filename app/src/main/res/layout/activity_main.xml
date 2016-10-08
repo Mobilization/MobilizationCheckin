@@ -12,11 +12,14 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:src="@drawable/barcode_scan"
         android:id="@+id/imageButtonScan"/>
 
     <EditText
+        android:layout_alignBaseline="@id/imageButtonScan"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:layout_toRightOf="@id/imageButtonScan"
-        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@id/imageButtonScan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/editTextFilter"/>

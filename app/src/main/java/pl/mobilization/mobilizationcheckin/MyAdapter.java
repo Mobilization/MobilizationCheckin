@@ -1,5 +1,6 @@
 package pl.mobilization.mobilizationcheckin;
 
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -37,7 +38,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
             int compareLast = POLISH_COLLATOR.compare(u1.getLast(), u2.getLast());
             if(compareLast != 0)
                 return compareLast;
-            int compareFirst = POLISH_COLLATOR.compare(u1.getFirst(), u2.getLast());
+            int compareFirst = POLISH_COLLATOR.compare(u1.getFirst(), u2.getFirst());
             if (compareFirst != 0)
                 return compareFirst;
             return u1.getNumber().compareTo(u2.getNumber());
@@ -55,7 +56,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
 
     @Override
     public MyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        RelativeLayout view = (RelativeLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.attendee, parent, false);
+        CardView view = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.attendee, parent, false);
         return new MyHolder(view, this);
     }
 
@@ -72,6 +73,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
 
     public void add(User user) {
         boolean setIsModified = users.add(user);
+
+        if(!setIsModified)
+            filteredUsers.remove(user);
 
         if(predicate.apply(user))
             filteredUsers.add(user);

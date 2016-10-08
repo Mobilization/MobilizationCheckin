@@ -1,5 +1,6 @@
 package pl.mobilization.mobilizationcheckin;
 
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -7,6 +8,9 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,7 +36,9 @@ public class MyHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.checkBoxChecked)
     CheckBox checkBoxChecked;
 
-    public MyHolder(RelativeLayout view, MyAdapter myAdapter) {
+
+
+    public MyHolder(CardView view, MyAdapter myAdapter) {
         super(view);
         this.myAdapter = myAdapter;
 
@@ -46,6 +52,7 @@ public class MyHolder extends RecyclerView.ViewHolder {
 
         textViewEmail.setText(user.getEmail());
         textViewType.setText(user.getType());
+        textViewType.setBackgroundColor(typeToColor(user.getType()));
 
         checkBoxChecked.setOnCheckedChangeListener(null);
         checkBoxChecked.setChecked(user.isChecked());
@@ -56,5 +63,27 @@ public class MyHolder extends RecyclerView.ViewHolder {
                 myAdapter.updateCheckedIn(user, checked);
             }
         });
+    }
+
+    static Map<String, Integer> COLOR_MAP = new HashMap<>();
+
+    static {
+        COLOR_MAP.put("blind bird", 0xff00ff00);
+        COLOR_MAP.put("early bird", 0xff00ee00);
+        COLOR_MAP.put("regular", 0xff00dd00);
+        COLOR_MAP.put("late bird", 0xff00cc00);
+        COLOR_MAP.put("organizer", 0xffffff00);
+
+        COLOR_MAP.put("vip", 0xffff0000);
+        COLOR_MAP.put("speaker", 0xff0000ff);
+
+    }
+
+    private int typeToColor(String type) {
+        Integer color = COLOR_MAP.get(type.toLowerCase());
+        if(color != null)
+            return color;
+        return 0x00ffffff;
+
     }
 }
