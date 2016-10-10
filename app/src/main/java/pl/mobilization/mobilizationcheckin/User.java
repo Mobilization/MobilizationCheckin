@@ -1,5 +1,7 @@
 package pl.mobilization.mobilizationcheckin;
 
+import com.google.firebase.database.Exclude;
+
 import org.apache.commons.lang3.*;
 
 /**
@@ -12,7 +14,9 @@ public class User {
     private String type;
     private String number;
     private boolean checked;
+    @Exclude
     private String firstLCN;
+    @Exclude
     private String lastLCN;
 
 
