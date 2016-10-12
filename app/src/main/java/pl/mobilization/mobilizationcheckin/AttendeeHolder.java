@@ -3,10 +3,8 @@ package pl.mobilization.mobilizationcheckin;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -18,9 +16,9 @@ import butterknife.ButterKnife;
 /**
  * Created by defecins on 04/10/16.
  */
-public class MyHolder extends RecyclerView.ViewHolder {
-    private static final String TAG = MyHolder.class.getSimpleName();
-    private final MyAdapter myAdapter;
+public class AttendeeHolder extends RecyclerView.ViewHolder {
+    private static final String TAG = AttendeeHolder.class.getSimpleName();
+    private final AttendeesAdapter attendeesAdapter;
     @BindView(R.id.textViewFirstName)
     TextView textViewFirstName;
 
@@ -38,9 +36,9 @@ public class MyHolder extends RecyclerView.ViewHolder {
 
 
 
-    public MyHolder(CardView view, MyAdapter myAdapter) {
+    public AttendeeHolder(CardView view, AttendeesAdapter attendeesAdapter) {
         super(view);
-        this.myAdapter = myAdapter;
+        this.attendeesAdapter = attendeesAdapter;
 
         ButterKnife.bind(this, itemView);
     }
@@ -60,7 +58,7 @@ public class MyHolder extends RecyclerView.ViewHolder {
         checkBoxChecked.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
-                myAdapter.updateCheckedIn(user, checked);
+                attendeesAdapter.updateCheckedIn(user, checked);
             }
         });
     }

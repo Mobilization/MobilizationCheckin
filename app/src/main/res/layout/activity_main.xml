@@ -29,8 +29,13 @@
     <android.support.v7.widget.RecyclerView
         android:layout_centerInParent="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" android:layout_below="@id/editTextFilter" android:id="@+id/recyclerGuest"/>
+        android:layout_height="match_parent" android:layout_below="@id/editTextFilter" android:id="@+id/recyclerGuest" android:layout_above="@+id/textViewCounter"/>
 
 
+    <TextView
+        android:id="@id/textViewCounter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

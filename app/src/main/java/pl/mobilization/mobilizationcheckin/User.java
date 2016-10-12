@@ -4,6 +4,8 @@ import com.google.firebase.database.Exclude;
 
 import org.apache.commons.lang3.*;
 
+import java.text.Normalizer;
+
 /**
  * Created by defecins on 03/10/16.
  */
@@ -54,11 +56,11 @@ public class User {
 
     public void setFirst(String first) {
         this.first = first;
-        this.firstLCN = stripAccentsAndPolishChars(first);
+        this.firstLCN = normalize(first);
     }
 
-    private String stripAccentsAndPolishChars(String first) {
-        return StringUtils.stripAccents(first).toLowerCase().replaceAll("ł","l").replaceAll("Ł","L");
+    public static String normalize(String str) {
+        return  Normalizer.normalize(str.toLowerCase(), Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+","").replace("ł","l");
     }
 
     public String getLast() {
@@ -67,7 +69,7 @@ public class User {
 
     public void setLast(String last) {
         this.last = last;
-        this.lastLCN = stripAccentsAndPolishChars(last);
+        this.lastLCN = normalize(last);
     }
 
     public String getEmail() {
@@ -102,10 +104,12 @@ public class User {
         this.checked = checked;
     }
 
+    @Exclude
     public String getFirstLCN() {
         return firstLCN;
     }
 
+    @Exclude
     public String getLastLCN() {
         return lastLCN;
     }

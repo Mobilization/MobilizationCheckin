@@ -4,22 +4,17 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Sets;
 
 import java.text.Collator;
 import java.text.Normalizer;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
@@ -27,10 +22,9 @@ import java.util.TreeSet;
 /**
  * Created by defecins on 04/10/16.
  */
-public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
+public class AttendeesAdapter extends RecyclerView.Adapter<AttendeeHolder> {
 
-    private static final String TAG = "MyAdapter";
-    private final MainActivity mainActivity;
+    private static final String TAG = "AttendeesAdapter";
     private static final Collator POLISH_COLLATOR = Collator.getInstance(new Locale("pl", "PL"));
     private static final Comparator<User> comparatorOfUserLexicographically = new Comparator<User>() {
         @Override
@@ -49,21 +43,28 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
     Set<User> filteredUsers = new TreeSet<>(comparatorOfUserLexicographically);
 
     Predicate<User> predicate = Predicates.alwaysTrue();
+    private FirebaseService service;
+    private int checkedInCount;
 
-    public MyAdapter(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
+    public AttendeesAdapter(FirebaseService service) {
+        this.service = service;
+        setHasStableIds(true);
     }
 
     @Override
-    public MyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public AttendeeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         CardView view = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.attendee, parent, false);
-        return new MyHolder(view, this);
+        return new AttendeeHolder(view, this);
     }
 
     @Override
-    public void onBindViewHolder(MyHolder holder, int position) {
-        User user = Iterators.get(filteredUsers.iterator(), position);
+    public void onBindViewHolder(AttendeeHolder holder, int position) {
+        User user = getUserAtPosition(position);
         holder.bind(user);
+    }
+
+    private User getUserAtPosition(int position) {
+        return Iterators.get(filteredUsers.iterator(), position);
     }
 
     @Override
@@ -89,19 +90,14 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
         notifyDataSetChanged();
     }
 
-    public void updateCheckedIn(User user, boolean checked) {
-        user.setChecked(checked);
-        mainActivity.updateCheckedIn(user);
-    }
-
     public void setFilter(String filter) {
         final String normalizedFilter = normalize(filter);
         String[] normalizedFilters = normalizedFilter.split("\\s+");
 
         if(normalizedFilter.length() == 0) {
             predicate = Predicates.alwaysTrue();
-            filteredUsers = new TreeSet<>(comparatorOfUserLexicographically);
-            filteredUsers.addAll(filteredUsers);
+            filteredUsers.clear();
+            filteredUsers.addAll(users);
             notifyDataSetChanged();
             return;
         }
@@ -120,6 +116,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
 
         filteredUsers.clear();
         Iterables.addAll(filteredUsers, FluentIterable.from(users).filter(predicate));
+        checkedInCount = FluentIterable.from(users).filter(CHECKED_IN_PREDICATE).size();
 
         notifyDataSetChanged();
     }
@@ -140,7 +137,33 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
 
     private static String normalize(String str) {
         return  Normalizer.normalize(str.toLowerCase(), Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+","").replace("ł","l");
+    }
 
+    public void updateCheckedIn(User user, boolean checked) {
+        user.setChecked(checked);
+        service.updateCheckedIn(user);
+    }
+
+    public int getCheckedInCount() {
+        return checkedInCount;
+    }
+
+    public float getStalaSaramaka() {
+        return users.size() == 0? 0 : 100.0f * checkedInCount/users.size();
+    }
+
+
+    static Predicate<User> CHECKED_IN_PREDICATE = new Predicate<User>() {
+
+        @Override
+        public boolean apply(User input) {
+            return input.isChecked();
+        }
+    };
+
+    @Override
+    public long getItemId(int position) {
+        return Long.parseLong(getUserAtPosition(position).getNumber());
     }
 
 

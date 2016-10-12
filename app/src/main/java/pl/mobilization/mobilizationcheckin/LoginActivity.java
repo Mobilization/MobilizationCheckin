@@ -1,11 +1,16 @@
 package pl.mobilization.mobilizationcheckin;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -18,85 +23,84 @@ import com.google.firebase.auth.FirebaseUser;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.functions.Action1;
 
 public class LoginActivity extends AppCompatActivity {
+    public FirebaseService service;
+
+    private boolean bound = false;
+
     @BindView(R.id.editTextUsername)
-    EditText username;
+    EditText editTextUsername;
 
     @BindView(R.id.editTextPassword)
-    EditText password;
+    EditText editTextPassword;
+
+    @BindView(R.id.buttonLogin)
+    Button buttonLogin;
+
+    private String TAG = LoginActivity.class.getSimpleName();
+
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            Log.d(TAG, String.format("onServiceConnected(%s)", componentName));
+            FirebaseService.LocalBinder binder = (FirebaseService.LocalBinder) iBinder;
+            service = binder.getService();
+            service.logged$().subscribe(new Action1<FirebaseService.LoginStatus>() {
+                @Override
+                public void call(FirebaseService.LoginStatus loginStatus) {
+                    Log.d(TAG, String.valueOf(loginStatus));
+                    switch(loginStatus) {
+                        case LOGGED_IN:
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            break;
+                        case NOT_LOGGED_IN:
+                            buttonLogin.setEnabled(true);
+                            break;
+                    }
+                }
+            });
+            bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            bound = false;
+        }
+    };
 
 
-    private FirebaseAuth.AuthStateListener mAuthListener;
-
-    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
-
-        mAuth = FirebaseAuth.getInstance();
-
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            public static final String TAG = "FirebaseAuth";
-
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                }
-                // ...
-            }
-        };
-        // ...
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
+    protected void onResume() {
+        super.onResume();
+
+        boolean bindService = bindService(new Intent(this, FirebaseService.class), mServiceConnection, Context.BIND_AUTO_CREATE);
+
+        Log.d(TAG, String.format("bindService %s", bindService));
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
+    protected void onPause() {
+        super.onPause();
+
+        if(bound)
+            unbindService(mServiceConnection);
     }
 
     @OnClick(R.id.buttonLogin)
     public void doLogin() {
-
-        mAuth.signInWithEmailAndPassword(username.getText().toString(), password.getText().toString())
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    public static final String TAG = "FirebaseAuth";
-
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
-
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithEmail:failed", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed",
-                                    Toast.LENGTH_LONG).show();
-                            return;
-                        }
-
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class ));
-
-                    }
-                });
+        service.login(editTextUsername.getText().toString(), editTextPassword.getText().toString());
+        buttonLogin.setEnabled(false);
     }
 
 }

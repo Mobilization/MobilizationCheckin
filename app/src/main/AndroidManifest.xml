@@ -21,7 +21,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service
-            android:name=".FirebaseIntentService"
+            android:name=".FirebaseService"
             android:exported="false"></service>
     </application>
 
