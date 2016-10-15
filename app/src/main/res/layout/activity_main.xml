@@ -10,32 +10,47 @@
     tools:context="pl.mobilization.mobilizationcheckin.MainActivity">
 
     <ImageButton
+        android:id="@+id/imageButtonScan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/barcode_scan"
-        android:id="@+id/imageButtonScan"/>
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/barcode_scan" />
+
+    <ImageButton
+        android:id="@+id/imageButtonLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/login" />
+
+    <TextView
+        android:id="@+id/textViewInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/imageButtonScan"
+        android:layout_toRightOf="@id/imageButtonLogin"
+        android:text="If the list is empty consider logging in" />
+
 
     <EditText
-        android:layout_alignBaseline="@id/imageButtonScan"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:layout_toRightOf="@id/imageButtonScan"
-        android:layout_alignBottom="@id/imageButtonScan"
+        android:id="@+id/editTextFilter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editTextFilter"/>
-
+        android:layout_below="@id/imageButtonScan"
+        android:lines="1"
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
 
     <android.support.v7.widget.RecyclerView
-        android:layout_centerInParent="true"
+        android:id="@+id/recyclerGuests"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" android:layout_below="@id/editTextFilter" android:id="@+id/recyclerGuest" android:layout_above="@+id/textViewCounter"/>
+        android:layout_height="match_parent"
+        android:layout_below="@id/editTextFilter"
+        android:layout_centerInParent="true" />
 
-
-    <TextView
-        android:id="@id/textViewCounter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

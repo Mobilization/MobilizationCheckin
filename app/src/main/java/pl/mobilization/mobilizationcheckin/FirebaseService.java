@@ -47,7 +47,7 @@ public class FirebaseService extends Service {
 
     private AttendeesAdapter adapter = new AttendeesAdapter(this);
     private ChildEventListener childEventListener;
-    private BehaviorSubject<LoginStatus> loginSubject = BehaviorSubject.<LoginStatus>create(LoginStatus.NOT_LOGGED_IN);
+    private BehaviorSubject<LoginStatus> loginSubject = BehaviorSubject.<LoginStatus>create(LoginStatus.LOGGED_OUT);
 
     public FirebaseService() {
     }
@@ -67,10 +67,11 @@ public class FirebaseService extends Service {
                 FirebaseUser currentUser = firebaseAuth.getCurrentUser();
 
                 if(currentUser != null) {
+                    Log.d(TAG, String.format("onAuthStateChanged - current user %s", currentUser.getEmail() ));
                     loginSubject.onNext(LoginStatus.LOGGED_IN);
                 }
                 else {
-                    loginSubject.onNext(LoginStatus.NOT_LOGGED_IN);
+                    loginSubject.onNext(LoginStatus.LOGGED_OUT);
                 }
             }
         };
@@ -86,7 +87,7 @@ public class FirebaseService extends Service {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
                 User user = getUser(dataSnapshot);
-                Log.d(TAG, String.format("onChildAdded(%s,%s)", user, previousChildName));
+                Log.v(TAG, String.format("onChildAdded(%s,%s)", user, previousChildName));
                 adapter.add(user);
             }
 
@@ -94,7 +95,7 @@ public class FirebaseService extends Service {
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
                 User user = getUser(dataSnapshot);
-                Log.d(TAG, String.format("onChildChanged(%s,%s)", user, previousChildName));
+                Log.v(TAG, String.format("onChildChanged(%s,%s)", user, previousChildName));
 
                 adapter.add(user);
             }
@@ -102,14 +103,14 @@ public class FirebaseService extends Service {
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 User user = getUser(dataSnapshot);
-                Log.d(TAG, String.format("onChildRemoved(%s,%s)"));
+                Log.v(TAG, String.format("onChildRemoved(%s,%s)"));
                 adapter.remove(user);
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
                 User user = getUser(dataSnapshot);
-                Log.d(TAG, String.format("onChildMoved(%s,%s)", user, previousChildName));
+                Log.v(TAG, String.format("onChildMoved(%s,%s)", user, previousChildName));
                 adapter.add(user);
             }
 
@@ -153,11 +154,8 @@ public class FirebaseService extends Service {
      * Handle action Foo in the provided background thread with the provided
      * parameters.
      */
-    public void login(String username, String password) {
+    public Observable<LoginStatus> login(String username, String password) {
         mAuth.signInWithEmailAndPassword(username, password);
-    }
-
-    public Observable<LoginStatus> logged$() {
         return loginSubject.asObservable();
     }
 
@@ -171,6 +169,11 @@ public class FirebaseService extends Service {
         reference.child(user.getNumber()).setValue(user);
     }
 
+    public Observable<LoginStatus> logout() {
+        mAuth.signOut();
+        return loginSubject.asObservable();
+    }
+
 
     public class LocalBinder extends Binder {
         FirebaseService getService() {
@@ -180,6 +183,6 @@ public class FirebaseService extends Service {
 
     public enum LoginStatus {
         LOGGED_IN,
-        NOT_LOGGED_IN
+        LOGGED_OUT
     }
 }

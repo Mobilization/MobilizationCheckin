@@ -1,34 +1,20 @@
 package pl.mobilization.mobilizationcheckin;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.functions.Action1;
 
-public class LoginActivity extends AppCompatActivity {
-    public FirebaseService service;
+import static android.widget.Toast.LENGTH_LONG;
 
-    private boolean bound = false;
+public class LoginActivity extends AppCompatActivity {
 
     @BindView(R.id.editTextUsername)
     EditText editTextUsername;
@@ -39,39 +25,12 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.buttonLogin)
     Button buttonLogin;
 
+    @BindView(R.id.buttonLogout)
+    Button buttonLogout;
+
     private String TAG = LoginActivity.class.getSimpleName();
 
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            Log.d(TAG, String.format("onServiceConnected(%s)", componentName));
-            FirebaseService.LocalBinder binder = (FirebaseService.LocalBinder) iBinder;
-            service = binder.getService();
-            service.logged$().subscribe(new Action1<FirebaseService.LoginStatus>() {
-                @Override
-                public void call(FirebaseService.LoginStatus loginStatus) {
-                    Log.d(TAG, String.valueOf(loginStatus));
-                    switch(loginStatus) {
-                        case LOGGED_IN:
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                            break;
-                        case NOT_LOGGED_IN:
-                            buttonLogin.setEnabled(true);
-                            break;
-                    }
-                }
-            });
-            bound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            bound = false;
-        }
-    };
-
-
+    private FirebaseServiceConnection mServiceConnection = new FirebaseServiceConnection(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,23 +43,44 @@ public class LoginActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        boolean bindService = bindService(new Intent(this, FirebaseService.class), mServiceConnection, Context.BIND_AUTO_CREATE);
-
-        Log.d(TAG, String.format("bindService %s", bindService));
+        mServiceConnection.bind();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        if(bound)
-            unbindService(mServiceConnection);
+        mServiceConnection.unbind();
     }
+
 
     @OnClick(R.id.buttonLogin)
     public void doLogin() {
-        service.login(editTextUsername.getText().toString(), editTextPassword.getText().toString());
-        buttonLogin.setEnabled(false);
+        mServiceConnection.login(editTextUsername.getText().toString(), editTextPassword.getText().toString()).subscribe(new Action1<FirebaseService.LoginStatus>() {
+            @Override
+            public void call(FirebaseService.LoginStatus loginStatus) {
+                switch (loginStatus) {
+                    case LOGGED_IN:
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        break;
+                    case LOGGED_OUT:
+                        Toast.makeText(LoginActivity.this, "Login failed", LENGTH_LONG).show();
+                        break;
+                }
+            }
+        });
+    }
+
+    @OnClick(R.id.buttonLogout)
+    public void doLogout() {
+        mServiceConnection.logout().subscribe(new Action1<FirebaseService.LoginStatus>() {
+            @Override
+            public void call(FirebaseService.LoginStatus loginResult) {
+
+                if (FirebaseService.LoginStatus.LOGGED_OUT.equals(loginResult))
+                    Toast.makeText(LoginActivity.this, "Logged out", LENGTH_LONG).show();
+                ;
+            }
+        });
     }
 
 }

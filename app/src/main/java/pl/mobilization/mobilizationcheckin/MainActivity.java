@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -20,56 +21,48 @@ import com.google.zxing.integration.android.IntentResult;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.functions.Action1;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
-
-    @BindView(R.id.recyclerGuest)
+    @BindView(R.id.recyclerGuests)
     RecyclerView recyclerView;
 
     @BindView(R.id.editTextFilter)
     EditText editTextFilter;
 
-    @BindView(R.id.textViewCounter)
-    TextView textViewCounter;
+    @BindView(R.id.textViewInfo)
+    TextView textViewInfo;
 
     private boolean bound;
-    public FirebaseService service;
 
 
-    private ServiceConnection serviceConnection = new ServiceConnection() {
+    private FirebaseServiceConnection serviceConnection = new FirebaseServiceConnection(this);
 
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            bound = true;
-            FirebaseService.LocalBinder binder = (FirebaseService.LocalBinder) iBinder;
-            service = binder.getService();
-
-            adapter = service.getAdapter();
-            recyclerView.setAdapter(adapter);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            bound = false;
-            recyclerView.setAdapter(null);
-        }
-    };
-    private AttendeesAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
+
+        serviceConnection.bind();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        bindService(new Intent(this, FirebaseService.class), serviceConnection, BIND_AUTO_CREATE);
+        serviceConnection.adapter$().subscribe(new Action1<AttendeesAdapter>() {
+            @Override
+            public void call(AttendeesAdapter attendeesAdapter) {
+                recyclerView.setAdapter(attendeesAdapter);
+            }
+        });
+
+        textViewInfo.setText("If list is empty please consider logging in");
+
 
         editTextFilter.addTextChangedListener(new TextWatcher() {
             @Override
@@ -84,11 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(adapter != null) {
-                    adapter.setFilter(editable.toString());
-
-                    textViewCounter.setText(String.valueOf(adapter.getStalaSaramaka()));
-                }
+                serviceConnection.setFilter(editable.toString());
             }
         });
 
@@ -100,8 +89,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        if(bound)
-            unbindService(serviceConnection);
+        serviceConnection.unbind();
     }
 
     @OnClick(R.id.imageButtonScan)
@@ -119,5 +107,10 @@ public class MainActivity extends AppCompatActivity {
             editTextFilter.setText(result.getContents());
             editTextFilter.moveCursorToVisibleOffset();
         }
+    }
+
+    @OnClick(R.id.imageButtonLogin)
+    public void onClick(View view) {
+        startActivity(new Intent(this, LoginActivity.class));
     }
 }

@@ -21,6 +21,9 @@ public class User {
     @Exclude
     private String lastLCN;
 
+    public User() {
+    }
+
 
     @Override
     public boolean equals(Object o) {
