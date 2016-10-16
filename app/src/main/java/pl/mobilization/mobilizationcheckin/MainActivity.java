@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -21,7 +22,9 @@ import com.google.zxing.integration.android.IntentResult;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Subscription;
 import rx.functions.Action1;
+import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -32,16 +35,23 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.editTextFilter)
     EditText editTextFilter;
 
-    @BindView(R.id.textViewInfo)
-    TextView textViewInfo;
+    @BindView(R.id.textViewChecked)
+    TextView textViewChecked;
+
+    @BindView(R.id.textViewTotal)
+    TextView textViewTotal;
+
+    @BindView(R.id.textViewStala)
+    TextView textViewStala;
 
     private boolean bound;
 
-
     private FirebaseServiceConnection serviceConnection = new FirebaseServiceConnection(this);
+    private CompositeSubscription subscriptions = new CompositeSubscription();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, String.format("%s.onCreate()", System.identityHashCode(this)));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -52,16 +62,42 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        Log.d(TAG, String.format("%s.onResume()", System.identityHashCode(this)));
         super.onResume();
 
-        serviceConnection.adapter$().subscribe(new Action1<AttendeesAdapter>() {
+        Subscription subscription =  serviceConnection.adapter$().subscribe(new Action1<AttendeesAdapter>() {
             @Override
             public void call(AttendeesAdapter attendeesAdapter) {
                 recyclerView.setAdapter(attendeesAdapter);
+
+                Subscription subscription1 = attendeesAdapter.stalaSaramaka$().subscribe(new Action1<Float>() {
+                    @Override
+                    public void call(Float aFloat) {
+                        textViewStala.setText(String.format("Stala saramaka is %s", aFloat));
+                    }
+                });
+
+                Subscription subscription2 = attendeesAdapter.checkedInCount$().subscribe(new Action1<Long>() {
+                    @Override
+                    public void call(Long aLong) {
+                        textViewChecked.setText(String.valueOf(aLong));
+                    }
+                });
+
+                Subscription subscription3 = attendeesAdapter.totalCount$().subscribe(new Action1<Long>() {
+                    @Override
+                    public void call(Long aLong) {
+                        textViewTotal.setText(String.valueOf(aLong));
+                    }
+                });
+
+                subscriptions.add(subscription1);
+                subscriptions.add(subscription2);
+                subscriptions.add(subscription3);
             }
         });
 
-        textViewInfo.setText("If list is empty please consider logging in");
+        subscriptions.add(subscription);
 
 
         editTextFilter.addTextChangedListener(new TextWatcher() {
@@ -87,7 +123,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        Log.d(TAG, String.format("%s.onPause()", System.identityHashCode(this)));
         super.onPause();
+
+        subscriptions.clear();
 
         serviceConnection.unbind();
     }
@@ -102,10 +141,10 @@ public class MainActivity extends AppCompatActivity {
     // Get the results:
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, String.format("%s.onActivityResult(%s,%s)", System.identityHashCode(this), requestCode, resultCode));
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if(result != null) {
             editTextFilter.setText(result.getContents());
-            editTextFilter.moveCursorToVisibleOffset();
         }
     }
 

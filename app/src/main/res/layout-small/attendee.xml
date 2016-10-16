@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:text="layout-small"/>
+            android:text="layout-normal"/>
 
         <TextView
             android:id="@+id/textViewFirstName"
@@ -37,11 +37,24 @@
             android:text="Last" />
 
         <TextView
+            android:layout_centerVertical="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:id="@+id/textViewType"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/textViewFirstName"
+            android:gravity="center"
+            android:text="Ticket type" />
+
+
+
+        <TextView
             android:id="@+id/textViewEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@id/textViewFirstName"
+            android:layout_below="@+id/textViewType"
             android:text="email"
             android:textAppearance="@android:style/TextAppearance.Medium" />
 
@@ -54,20 +67,8 @@
             android:layout_height="wrap_content"
             android:button="@drawable/custom_checkbox"
             android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@id/textViewType"
             android:layout_centerVertical="true"
             android:gravity="center" />
-
-
-        <TextView
-            android:layout_centerVertical="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:id="@+id/textViewType"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/textViewEmail"
-            android:gravity="center"
-            android:text="Ticket type" />
-
     </RelativeLayout>
 </android.support.v7.widget.CardView>

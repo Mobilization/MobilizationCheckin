@@ -11,6 +11,7 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
+import com.google.common.primitives.Floats;
 
 import java.text.Collator;
 import java.text.Normalizer;
@@ -18,6 +19,12 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
+
+import rx.Observable;
+import rx.functions.Action1;
+import rx.functions.Func2;
+import rx.functions.FuncN;
+import rx.subjects.BehaviorSubject;
 
 /**
  * Created by defecins on 04/10/16.
@@ -44,11 +51,18 @@ public class AttendeesAdapter extends RecyclerView.Adapter<AttendeeHolder> {
 
     Predicate<User> predicate = Predicates.alwaysTrue();
     private FirebaseService service;
+
+    private BehaviorSubject<Long> totalCountSubject = BehaviorSubject.create(Long.valueOf(0));
+    private BehaviorSubject<Long> checkedCountSubject = BehaviorSubject.create(Long.valueOf(0));
+    private BehaviorSubject<Float> stalaSaramakSubject = BehaviorSubject.create(Float.valueOf(0));
     private int checkedInCount;
+
 
     public AttendeesAdapter(FirebaseService service) {
         this.service = service;
         setHasStableIds(true);
+
+
     }
 
     @Override
@@ -73,15 +87,33 @@ public class AttendeesAdapter extends RecyclerView.Adapter<AttendeeHolder> {
     }
 
     public void add(User user) {
-        boolean setIsModified = users.add(user);
+        boolean wasAddedToUsers = users.add(user);
 
-        if(!setIsModified)
+        if(wasUserUpdate(wasAddedToUsers)) {
             filteredUsers.remove(user);
+        }
 
         if(predicate.apply(user))
             filteredUsers.add(user);
 
+        if(wasAddedToUsers)
+            totalCountSubject.onNext(Long.valueOf(users.size()));
+
+        checkedCountSubject.onNext(Long.valueOf(getCheckdInCount()));
+        stalaSaramakSubject.onNext(Float.valueOf(getStalaSaramaka()));
+
         notifyDataSetChanged();
+    }
+
+    private float getStalaSaramaka() {
+        if(users.size() == 0)
+            return 0.0f;
+
+        return (100.0f*checkedInCount)/users.size();
+    }
+
+    private boolean wasUserUpdate(boolean setIsModified) {
+        return !setIsModified;
     }
 
     public void remove(User user) {
@@ -116,9 +148,13 @@ public class AttendeesAdapter extends RecyclerView.Adapter<AttendeeHolder> {
 
         filteredUsers.clear();
         Iterables.addAll(filteredUsers, FluentIterable.from(users).filter(predicate));
-        checkedInCount = FluentIterable.from(users).filter(CHECKED_IN_PREDICATE).size();
+        checkedCountSubject.onNext(Long.valueOf(getCheckdInCount()));
 
         notifyDataSetChanged();
+    }
+
+    private int getCheckdInCount() {
+        return checkedInCount = FluentIterable.from(users).filter(CHECKED_IN_PREDICATE).size();
     }
 
     static Comparator<String> lexicographicalComparator = new Comparator<String>() {
@@ -144,15 +180,6 @@ public class AttendeesAdapter extends RecyclerView.Adapter<AttendeeHolder> {
         service.updateCheckedIn(user);
     }
 
-    public int getCheckedInCount() {
-        return checkedInCount;
-    }
-
-    public float getStalaSaramaka() {
-        return users.size() == 0? 0 : 100.0f * checkedInCount/users.size();
-    }
-
-
     static Predicate<User> CHECKED_IN_PREDICATE = new Predicate<User>() {
 
         @Override
@@ -166,5 +193,15 @@ public class AttendeesAdapter extends RecyclerView.Adapter<AttendeeHolder> {
         return Long.parseLong(getUserAtPosition(position).getNumber());
     }
 
+    public Observable<Long> totalCount$() {
+        return totalCountSubject.asObservable();
+    }
 
+    public Observable<Long> checkedInCount$() {
+        return checkedCountSubject.asObservable();
+    }
+
+    public Observable<Float> stalaSaramaka$() {
+        return stalaSaramakSubject.asObservable();
+    }
 }

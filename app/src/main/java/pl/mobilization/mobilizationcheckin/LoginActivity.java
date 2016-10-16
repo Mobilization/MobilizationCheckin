@@ -10,7 +10,9 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Subscription;
 import rx.functions.Action1;
+import rx.subscriptions.CompositeSubscription;
 
 import static android.widget.Toast.LENGTH_LONG;
 
@@ -28,6 +30,8 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.buttonLogout)
     Button buttonLogout;
 
+    private CompositeSubscription subscriptions = new CompositeSubscription();
+
     private String TAG = LoginActivity.class.getSimpleName();
 
     private FirebaseServiceConnection mServiceConnection = new FirebaseServiceConnection(this);
@@ -42,7 +46,6 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
         mServiceConnection.bind();
     }
 
@@ -50,12 +53,13 @@ public class LoginActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         mServiceConnection.unbind();
+        subscriptions.clear();
     }
 
 
     @OnClick(R.id.buttonLogin)
     public void doLogin() {
-        mServiceConnection.login(editTextUsername.getText().toString(), editTextPassword.getText().toString()).subscribe(new Action1<FirebaseService.LoginStatus>() {
+        Subscription subscription = mServiceConnection.login(editTextUsername.getText().toString(), editTextPassword.getText().toString()).subscribe(new Action1<FirebaseService.LoginStatus>() {
             @Override
             public void call(FirebaseService.LoginStatus loginStatus) {
                 switch (loginStatus) {
@@ -68,11 +72,13 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+
+        subscriptions.add(subscription);
     }
 
     @OnClick(R.id.buttonLogout)
     public void doLogout() {
-        mServiceConnection.logout().subscribe(new Action1<FirebaseService.LoginStatus>() {
+        Subscription subscription = mServiceConnection.logout().subscribe(new Action1<FirebaseService.LoginStatus>() {
             @Override
             public void call(FirebaseService.LoginStatus loginResult) {
 
@@ -81,6 +87,7 @@ public class LoginActivity extends AppCompatActivity {
                 ;
             }
         });
+        subscriptions.add(subscription);
     }
 
 }

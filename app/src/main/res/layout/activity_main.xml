@@ -13,33 +13,24 @@
         android:id="@+id/imageButtonScan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
         android:src="@drawable/barcode_scan" />
 
     <ImageButton
         android:id="@+id/imageButtonLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
         android:src="@drawable/login" />
-
-    <TextView
-        android:id="@+id/textViewInfo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@id/imageButtonScan"
-        android:layout_toRightOf="@id/imageButtonLogin"
-        android:text="If the list is empty consider logging in" />
 
 
     <EditText
         android:id="@+id/editTextFilter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/imageButtonScan"
+        android:layout_alignParentTop="true"
         android:lines="1"
         android:maxLines="1"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
@@ -49,8 +40,55 @@
         android:id="@+id/recyclerGuests"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/editTextFilter"
+        android:layout_above="@+id/imageButtonLogin"
+        android:layout_below="@+id/editTextFilter"
         android:layout_centerInParent="true" />
 
+    <LinearLayout
+        android:layout_alignTop="@id/imageButtonScan"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_toLeftOf="@+id/imageButtonLogin"
+        android:layout_toRightOf="@+id/imageButtonScan"
+        android:gravity="center">
+
+
+    <TextView
+        android:id="@+id/textViewChecked"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignTop="@id/imageButtonLogin"
+        android:gravity="center"
+        android:text="0"
+        android:textAlignment="center" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:text="/"/>
+
+    <TextView
+        android:id="@+id/textViewTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignTop="@id/imageButtonLogin"
+        android:gravity="center"
+        android:text="750"
+        android:textAlignment="center" />
+
+    <TextView
+        android:layout_marginLeft="5dp"
+        android:id="@+id/textViewStala"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignTop="@id/imageButtonLogin"
+        android:gravity="center"
+        android:text="0.0"
+        android:textAlignment="center" />
+    </LinearLayout>
 
 </RelativeLayout>
