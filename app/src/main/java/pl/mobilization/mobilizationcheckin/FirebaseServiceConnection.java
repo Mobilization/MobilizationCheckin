@@ -11,6 +11,7 @@ import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.subjects.PublishSubject;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Created by defecins on 15/10/16.
@@ -20,6 +21,8 @@ public class FirebaseServiceConnection {
     private final Context context;
     PublishSubject<AttendeesAdapter> adapterPublishSubject = PublishSubject.create();
     PublishSubject<String> filterSubject = PublishSubject.create();
+    PublishSubject<String> loggedInAs = PublishSubject.create();
+
     private boolean bound;
     private IBinder iBinder;
     private FirebaseService service;
@@ -64,13 +67,17 @@ public class FirebaseServiceConnection {
         return boundResult;
     }
 
+    public Observable<String> logged$() {
+        return loggedInAs.asObservable();
+    }
+
     private enum BoundResult {
         BOUND,
         NOT_BOUND
     }
 
     private class MyServiceConnction implements ServiceConnection {
-        private Subscription subscription;
+        private CompositeSubscription subscriptions = new CompositeSubscription();
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -81,22 +88,34 @@ public class FirebaseServiceConnection {
             FirebaseService.LocalBinder binder = (FirebaseService.LocalBinder) iBinder;
             service = binder.getService();
 
+
+            Subscription subscription = service.loggedInAs$().subscribe(new Action1<String>() {
+                @Override
+                public void call(String loggedInAs) {
+                    FirebaseServiceConnection.this.loggedInAs.onNext(loggedInAs);
+                }
+            });
+
+            subscriptions.add(subscription);
+
             final AttendeesAdapter adapter = service.getAdapter();
             adapterPublishSubject.onNext(adapter);
 
-            subscription = filterSubject.subscribe(new Action1<String>() {
+            Subscription subscription2 = filterSubject.subscribe(new Action1<String>() {
                 @Override
                 public void call(String filter) {
                     adapter.setFilter(filter);
                 }
             });
+
+            subscriptions.add(subscription2);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             bound = false;
             adapterPublishSubject.onNext(null);
-            subscription.unsubscribe();
+            subscriptions.clear();
         }
     }
 }

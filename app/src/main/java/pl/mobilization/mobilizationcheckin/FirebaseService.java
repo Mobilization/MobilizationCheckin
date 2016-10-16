@@ -37,6 +37,7 @@ public class FirebaseService extends Service {
 
 
     private static final String TAG = FirebaseService.class.getSimpleName();
+    public static final String NOT_LOGGED_IN = "Not logged in";
 
 
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -48,6 +49,7 @@ public class FirebaseService extends Service {
     private AttendeesAdapter adapter = new AttendeesAdapter(this);
     private ChildEventListener childEventListener;
     private BehaviorSubject<LoginStatus> loginSubject = BehaviorSubject.<LoginStatus>create(LoginStatus.LOGGED_OUT);
+    private BehaviorSubject<String> loggedInAsSubject = BehaviorSubject.create(NOT_LOGGED_IN);
 
     public FirebaseService() {
     }
@@ -69,9 +71,11 @@ public class FirebaseService extends Service {
                 if(currentUser != null) {
                     Log.d(TAG, String.format("onAuthStateChanged - current user %s", currentUser.getEmail() ));
                     loginSubject.onNext(LoginStatus.LOGGED_IN);
+                    loggedInAsSubject.onNext(currentUser.getEmail());
                 }
                 else {
                     loginSubject.onNext(LoginStatus.LOGGED_OUT);
+                    loggedInAsSubject.onNext(NOT_LOGGED_IN);
                 }
             }
         };
@@ -166,12 +170,16 @@ public class FirebaseService extends Service {
 
     public void updateCheckedIn(User user) {
         Log.d(TAG, String.format("updateCheckedIn(%s)", user));
-        reference.child(String.valueOf(user.getNumber())).setValue(user);
+        reference.child(user.getNumber()).setValue(user);
     }
 
     public Observable<LoginStatus> logout() {
         mAuth.signOut();
         return loginSubject.asObservable();
+    }
+
+    public Observable<String> loggedInAs$() {
+        return loggedInAsSubject.asObservable();
     }
 
 
