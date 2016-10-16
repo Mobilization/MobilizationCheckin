@@ -12,20 +12,13 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:text="layout"/>
-
-        <TextView
             android:id="@+id/textViewFirstName"
             style="@style/TextAppearance.AppCompat.Large"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
             android:layout_marginRight="5dp"
-            android:text="First" />
+            android:text="@string/first" />
 
         <TextView
             android:id="@+id/textViewLastName"
@@ -34,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@id/textViewFirstName"
-            android:text="Last" />
+            android:text="@string/last" />
 
         <TextView
             android:id="@+id/textViewEmail"
@@ -42,31 +35,31 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@id/textViewFirstName"
-            android:text="email"
+            android:text="@string/email"
             android:textAppearance="@android:style/TextAppearance.Medium" />
 
 
         <CheckBox
-            android:layout_margin="5dp"
             android:id="@+id/checkBoxChecked"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:button="@drawable/custom_checkbox"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:layout_margin="5dp"
+            android:button="@drawable/custom_checkbox"
             android:gravity="center" />
 
 
         <TextView
-            android:layout_centerVertical="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:id="@+id/textViewType"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignBottom="@id/textViewEmail"
+            android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/checkBoxChecked"
             android:gravity="center"
-            android:text="Ticket type" />
+            android:text="@string/ticket_type"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     </RelativeLayout>
 </android.support.v7.widget.CardView>

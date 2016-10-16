@@ -140,7 +140,11 @@ public class AttendeesAdapter extends RecyclerView.Adapter<AttendeeHolder> {
                 return new Predicate<User>() {
                     @Override
                     public boolean apply(User user) {
-                        return user.getFirstLCN().contains(subFilter) || user.getLastLCN().contains(subFilter) || user.getEmail().contains(subFilter) || user.getNumber().contains(subFilter);
+                        return user.getFirstLCN().contains(subFilter)
+                                || user.getLastLCN().contains(subFilter)
+                                || user.getEmail().contains(subFilter)
+                                || user.getNumber().contains(subFilter)
+                                || user.getOrderid().contains(subFilter);
                     }
                 };
             }

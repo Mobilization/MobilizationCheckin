@@ -80,7 +80,6 @@ public class FirebaseService extends Service {
         childEventListener = new ChildEventListener() {
             private User getUser(DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
-                user.setNumber(dataSnapshot.getKey());
                 return user;
             }
 
@@ -120,6 +119,7 @@ public class FirebaseService extends Service {
             }
         };
         reference.addChildEventListener(childEventListener);
+        reference.keepSynced(true);
     }
 
     @Override
@@ -166,7 +166,7 @@ public class FirebaseService extends Service {
 
     public void updateCheckedIn(User user) {
         Log.d(TAG, String.format("updateCheckedIn(%s)", user));
-        reference.child(user.getNumber()).setValue(user);
+        reference.child(String.valueOf(user.getNumber())).setValue(user);
     }
 
     public Observable<LoginStatus> logout() {

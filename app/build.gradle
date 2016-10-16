@@ -35,7 +35,6 @@ dependencies {
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
 
     compile 'com.google.guava:guava:20.0-rc1'
-    compile 'org.apache.commons:commons-lang3:3.4'
 
     compile 'com.google.zxing:android-integration:3.3.0'
 

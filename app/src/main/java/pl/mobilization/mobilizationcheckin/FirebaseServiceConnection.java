@@ -56,7 +56,6 @@ public class FirebaseServiceConnection {
         if (bound)
             FirebaseServiceConnection.this.context.unbindService(serviceConnction);
         bound = false;
-
     }
 
     public boolean bind() {

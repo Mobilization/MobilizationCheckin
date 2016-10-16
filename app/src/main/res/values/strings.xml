@@ -4,4 +4,8 @@
 
     <string name="username">marekdef@gmail.com</string>
     <string name="password"></string>
+    <string name="first">First name</string>
+    <string name="last">Last name</string>
+    <string name="email">email</string>
+    <string name="ticket_type">Ticket type</string>
 </resources>

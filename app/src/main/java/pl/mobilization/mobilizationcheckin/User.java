@@ -1,8 +1,7 @@
 package pl.mobilization.mobilizationcheckin;
 
+import com.google.common.base.Strings;
 import com.google.firebase.database.Exclude;
-
-import org.apache.commons.lang3.*;
 
 import java.text.Normalizer;
 
@@ -16,6 +15,7 @@ public class User {
     private String type;
     private String number;
     private boolean checked;
+    private String orderid;
     @Exclude
     private String firstLCN;
     @Exclude
@@ -24,6 +24,17 @@ public class User {
     public User() {
     }
 
+    public static String normalize(String str) {
+        return Normalizer.normalize(str.toLowerCase(), Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "").replace("ł", "l");
+    }
+
+    public String getOrderid() {
+        return orderid;
+    }
+
+    public void setOrderid(String orderid) {
+        this.orderid = orderid;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -49,6 +60,7 @@ public class User {
                 ", email='" + email + '\'' +
                 ", type='" + type + '\'' +
                 ", number='" + number + '\'' +
+                ", orderid='" + orderid + '\'' +
                 ", checked=" + checked +
                 '}';
     }
@@ -62,10 +74,6 @@ public class User {
         this.firstLCN = normalize(first);
     }
 
-    public static String normalize(String str) {
-        return  Normalizer.normalize(str.toLowerCase(), Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+","").replace("ł","l");
-    }
-
     public String getLast() {
         return last;
     }
@@ -76,7 +84,7 @@ public class User {
     }
 
     public String getEmail() {
-        return email;
+        return Strings.nullToEmpty(email);
     }
 
     public void setEmail(String email) {
@@ -92,7 +100,7 @@ public class User {
     }
 
     public String getNumber() {
-        return number;
+        return Strings.nullToEmpty(number);
     }
 
     public void setNumber(String number) {
@@ -109,11 +117,11 @@ public class User {
 
     @Exclude
     public String getFirstLCN() {
-        return firstLCN;
+        return Strings.nullToEmpty(firstLCN);
     }
 
     @Exclude
     public String getLastLCN() {
-        return lastLCN;
+        return Strings.nullToEmpty(lastLCN);
     }
 }
