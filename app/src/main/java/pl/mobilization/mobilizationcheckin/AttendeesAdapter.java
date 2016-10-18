@@ -11,7 +11,6 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import com.google.common.primitives.Floats;
 
 import java.text.Collator;
 import java.text.Normalizer;
@@ -21,9 +20,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import rx.Observable;
-import rx.functions.Action1;
-import rx.functions.Func2;
-import rx.functions.FuncN;
 import rx.subjects.BehaviorSubject;
 
 /**
@@ -61,8 +57,6 @@ public class AttendeesAdapter extends RecyclerView.Adapter<AttendeeHolder> {
     public AttendeesAdapter(FirebaseService service) {
         this.service = service;
         setHasStableIds(true);
-
-
     }
 
     @Override
@@ -87,19 +81,16 @@ public class AttendeesAdapter extends RecyclerView.Adapter<AttendeeHolder> {
     }
 
     public void add(User user) {
-        boolean wasAddedToUsers = users.add(user);
+        users.remove(user);
+        users.add(user);
 
-        if(wasUserUpdate(wasAddedToUsers)) {
-            filteredUsers.remove(user);
-        }
+        filteredUsers.remove(user);
 
         if(predicate.apply(user))
             filteredUsers.add(user);
 
-        if(wasAddedToUsers)
-            totalCountSubject.onNext(Long.valueOf(users.size()));
-
-        checkedCountSubject.onNext(Long.valueOf(getCheckdInCount()));
+        totalCountSubject.onNext(Long.valueOf(users.size()));
+        checkedCountSubject.onNext(Long.valueOf(getCheckedInCount()));
         stalaSaramakSubject.onNext(Float.valueOf(getStalaSaramaka()));
 
         notifyDataSetChanged();
@@ -152,23 +143,23 @@ public class AttendeesAdapter extends RecyclerView.Adapter<AttendeeHolder> {
 
         filteredUsers.clear();
         Iterables.addAll(filteredUsers, FluentIterable.from(users).filter(predicate));
-        checkedCountSubject.onNext(Long.valueOf(getCheckdInCount()));
+        checkedCountSubject.onNext(Long.valueOf(getCheckedInCount()));
 
         notifyDataSetChanged();
     }
 
-    private int getCheckdInCount() {
+    private int getCheckedInCount() {
         return checkedInCount = FluentIterable.from(users).filter(CHECKED_IN_PREDICATE).size();
     }
 
     static Comparator<String> lexicographicalComparator = new Comparator<String>() {
         @Override
-        public int compare(String str, String t1) {
-            return str.compareTo(t1);
+        public int compare(String str1, String str2) {
+            return str1.compareTo(str2);
         }
     };
 
-    static Function<User, String> user2NumberTransformation = new Function<User, String>() {
+    static Function<User, String> USER_TO_NUMBER_TRANSFORMATION = new Function<User, String>() {
         @Override
         public String apply(User user) {
             return user.getNumber();

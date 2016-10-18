@@ -99,6 +99,7 @@ public class FirebaseServiceConnection {
             subscriptions.add(subscription);
 
             final AttendeesAdapter adapter = service.getAdapter();
+            Log.d(TAG, String.format("adapterPublishSubject.onNext(%s)", adapter));
             adapterPublishSubject.onNext(adapter);
 
             Subscription subscription2 = filterSubject.subscribe(new Action1<String>() {

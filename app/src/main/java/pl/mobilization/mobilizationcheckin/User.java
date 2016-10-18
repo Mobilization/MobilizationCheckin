@@ -25,15 +25,15 @@ public class User {
     }
 
     public static String normalize(String str) {
-        return Normalizer.normalize(str.toLowerCase(), Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "").replace("ł", "l");
+        return Normalizer.normalize(Strings.nullToEmpty(str).toLowerCase(), Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "").replace("ł", "l");
     }
 
     public String getOrderid() {
-        return orderid;
+        return Strings.nullToEmpty(orderid);
     }
 
     public void setOrderid(String orderid) {
-        this.orderid = orderid;
+        this.orderid = Strings.nullToEmpty(orderid);
     }
 
     @Override
@@ -84,11 +84,11 @@ public class User {
     }
 
     public String getEmail() {
-        return Strings.nullToEmpty(email);
+        return email;
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = Strings.nullToEmpty(email);
     }
 
     public String getType() {
@@ -96,15 +96,15 @@ public class User {
     }
 
     public void setType(String type) {
-        this.type = type;
+        this.type = Strings.nullToEmpty(type);
     }
 
     public String getNumber() {
-        return Strings.nullToEmpty(number);
+        return number;
     }
 
     public void setNumber(String number) {
-        this.number = number;
+        this.number = Strings.nullToEmpty(number);
     }
 
     public boolean isChecked() {
@@ -117,11 +117,11 @@ public class User {
 
     @Exclude
     public String getFirstLCN() {
-        return Strings.nullToEmpty(firstLCN);
+        return firstLCN;
     }
 
     @Exclude
     public String getLastLCN() {
-        return Strings.nullToEmpty(lastLCN);
+        return lastLCN;
     }
 }
