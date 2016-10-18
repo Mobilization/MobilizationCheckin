@@ -8,6 +8,6 @@
     <string name="last">Last name</string>
     <string name="email">email</string>
     <string name="ticket_type">Ticket type</string>
-    <string name="hint">Type any part of first, last name, email, order id or ticket number</string>
+    <string name="hint">Type anything</string>
     <string name="not_logged_in">Not logged in</string>
 </resources>
