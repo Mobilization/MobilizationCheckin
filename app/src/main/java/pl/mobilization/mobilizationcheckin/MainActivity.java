@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 Subscription subscription1 = attendeesAdapter.stalaSaramaka$().subscribe(new Action1<Float>() {
                     @Override
                     public void call(Float aFloat) {
-                        textViewStala.setText(String.format("Stala saramaka is %s", aFloat));
+                        textViewStala.setText(String.format("Stała Saramaka is %s", aFloat));
                     }
                 });
 
