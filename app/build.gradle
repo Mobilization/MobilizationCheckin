@@ -13,10 +13,24 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        release {
+            keyAlias MOB6_ALIAS
+            keyPassword MOB6_KEY_PASSWORD
+            storeFile file("../mobilization.keystore")
+            storePassword MOB6_STORE_PASSWORD
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.release
         }
     }
 }
