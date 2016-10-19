@@ -124,6 +124,8 @@ public class FirebaseService extends Service {
         };
         reference.addChildEventListener(childEventListener);
         reference.keepSynced(true);
+
+        reference.goOnline();
     }
 
     @Override
