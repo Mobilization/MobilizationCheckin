@@ -80,20 +80,32 @@ public class AttendeesAdapter extends RecyclerView.Adapter<AttendeeHolder> {
         return filteredUsers.size();
     }
 
-    public void add(User user) {
-        users.remove(user);
-        users.add(user);
+    public void addOrUpdate(final User newUser) {
+        final User found = findUser(newUser);
 
-        filteredUsers.remove(user);
+        if(found != null) {
+            users.remove(found);
+            filteredUsers.remove(found);
+        }
+        users.add(newUser);
 
-        if(predicate.apply(user))
-            filteredUsers.add(user);
+        if(predicate.apply(newUser))
+            filteredUsers.add(newUser);
 
         totalCountSubject.onNext(Long.valueOf(users.size()));
         checkedCountSubject.onNext(Long.valueOf(getCheckedInCount()));
         stalaSaramakSubject.onNext(Float.valueOf(getStalaSaramaka()));
 
         notifyDataSetChanged();
+    }
+
+    private User findUser(final User user) {
+        return Iterables.getFirst(FluentIterable.from(users).filter(new Predicate<User>() {
+            @Override
+            public boolean apply(User input) {
+                return input.getNumber().equals(user.getNumber());
+            }
+        }), null);
     }
 
     private float getStalaSaramaka() {
