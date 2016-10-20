@@ -56,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void call(String loggedInAs) {
                 textViewInfo.setText(loggedInAs);
+                editTextUsername.setText(loggedInAs);
             }
         });
 

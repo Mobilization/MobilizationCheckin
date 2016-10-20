@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.util.Log;
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by defecins on 15/10/16.
@@ -17,6 +19,7 @@ public class MobilizationCheckInApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
         Log.d(TAG, "onCreate()");
 
 
