@@ -91,7 +91,7 @@ public class FirebaseService extends Service {
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
                 User user = getUser(dataSnapshot);
                 Log.v(TAG, String.format("onChildAdded(%s,%s)", user, previousChildName));
-                adapter.add(user);
+                adapter.addOrUpdate(user);
             }
 
 
@@ -100,7 +100,7 @@ public class FirebaseService extends Service {
                 User user = getUser(dataSnapshot);
                 Log.v(TAG, String.format("onChildChanged(%s,%s)", user, previousChildName));
 
-                adapter.add(user);
+                adapter.addOrUpdate(user);
             }
 
             @Override
@@ -114,7 +114,7 @@ public class FirebaseService extends Service {
             public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
                 User user = getUser(dataSnapshot);
                 Log.v(TAG, String.format("onChildMoved(%s,%s)", user, previousChildName));
-                adapter.add(user);
+                adapter.addOrUpdate(user);
             }
 
             @Override
