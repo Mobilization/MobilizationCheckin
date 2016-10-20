@@ -106,7 +106,7 @@ public class FirebaseService extends Service {
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 User user = getUser(dataSnapshot);
-                Log.v(TAG, String.format("onChildRemoved(%s,%s)"));
+                Log.v(TAG, String.format("onChildRemoved(%s)", user));
                 adapter.remove(user);
             }
 
