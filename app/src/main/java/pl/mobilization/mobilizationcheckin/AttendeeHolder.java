@@ -70,6 +70,7 @@ public class AttendeeHolder extends RecyclerView.ViewHolder {
         COLOR_MAP.put("early bird", 0xff00ee00);
         COLOR_MAP.put("regular", 0xff00dd00);
         COLOR_MAP.put("late bird", 0xff00cc00);
+        COLOR_MAP.put("last bird", 0xff00bb00);
         COLOR_MAP.put("organizer", 0xffffff00);
 
         COLOR_MAP.put("vip", 0xffff0000);
