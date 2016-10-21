@@ -7,7 +7,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -19,7 +18,6 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
-import rx.subjects.PublishSubject;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -57,7 +55,7 @@ public class FirebaseService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.v(TAG, "onCreate");
+        //Log.v(TAG, "onCreate");
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -65,11 +63,11 @@ public class FirebaseService extends Service {
 
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                Log.d(TAG, String.format("onAuthStateChanged", firebaseAuth.getCurrentUser()));
+                //Log.v(TAG, String.format("onAuthStateChanged", firebaseAuth.getCurrentUser()));
                 FirebaseUser currentUser = firebaseAuth.getCurrentUser();
 
                 if(currentUser != null) {
-                    Log.d(TAG, String.format("onAuthStateChanged - current user %s", currentUser.getEmail() ));
+                    //Log.v(TAG, String.format("onAuthStateChanged - current user %s", currentUser.getEmail() ));
                     loginSubject.onNext(LoginStatus.LOGGED_IN);
                     loggedInAsSubject.onNext(currentUser.getEmail());
                 }
@@ -90,7 +88,7 @@ public class FirebaseService extends Service {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
                 User user = getUser(dataSnapshot);
-                Log.v(TAG, String.format("onChildAdded(%s,%s)", user, previousChildName));
+                //Log.v(TAG, String.format("onChildAdded(%s,%s)", user, previousChildName));
                 adapter.addOrUpdate(user);
             }
 
@@ -98,7 +96,7 @@ public class FirebaseService extends Service {
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
                 User user = getUser(dataSnapshot);
-                Log.v(TAG, String.format("onChildChanged(%s,%s)", user, previousChildName));
+                //Log.v(TAG, String.format("onChildChanged(%s,%s)", user, previousChildName));
 
                 adapter.addOrUpdate(user);
             }
@@ -106,14 +104,14 @@ public class FirebaseService extends Service {
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 User user = getUser(dataSnapshot);
-                Log.v(TAG, String.format("onChildRemoved(%s)", user));
+                //Log.v(TAG, String.format("onChildRemoved(%s)", user));
                 adapter.remove(user);
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
                 User user = getUser(dataSnapshot);
-                Log.v(TAG, String.format("onChildMoved(%s,%s)", user, previousChildName));
+                //Log.v(TAG, String.format("onChildMoved(%s,%s)", user, previousChildName));
                 adapter.addOrUpdate(user);
             }
 
@@ -137,21 +135,21 @@ public class FirebaseService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "onDestroy()");
+        //Log.v(TAG, "onDestroy()");
         super.onDestroy();
   }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d(TAG, "onBind()");
+        //Log.v(TAG, "onBind()");
         mAuth.addAuthStateListener(mAuthListener);
         return new LocalBinder();
     }
 
     @Override
     public void onRebind(Intent intent) {
-        Log.d(TAG, "onRebind()");
+        //Log.v(TAG, "onRebind()");
         mAuth.addAuthStateListener(mAuthListener);
     }
 
@@ -171,7 +169,7 @@ public class FirebaseService extends Service {
     }
 
     public void updateCheckedIn(User user) {
-        Log.d(TAG, String.format("updateCheckedIn(%s)", user));
+        //Log.v(TAG, String.format("updateCheckedIn(%s)", user));
         reference.child(user.getNumber()).setValue(user);
     }
 
